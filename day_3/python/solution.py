@@ -42,7 +42,7 @@ def part_2(data: str) -> int:
         elif enabled:
             mults.append(op)
 
-        nums_pattern = r"\d{1,3},\d{1,3}"
+    nums_pattern = r"\d{1,3},\d{1,3}"
 
     mult_str = "".join(mults)
 

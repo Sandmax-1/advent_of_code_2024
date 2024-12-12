@@ -32,7 +32,7 @@ def part_2(id_list_1: list[int], id_list_2: list[int]) -> int:
 
 
 if __name__ == "__main__":
-    id_list_1, id_list_2 = parse_input("actual_input.txt")
+    id_list_1, id_list_2 = parse_input("test_input.txt")
     sol_1 = part_1(id_list_1, id_list_2)
     sol_2 = part_2(id_list_1, id_list_2)
     print(sol_1, sol_2)

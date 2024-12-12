@@ -96,10 +96,10 @@ def move_guard(grid: list[list[str]], start: Coordinate) -> int:
             return 0
 
         elif grid[new_pos.y][new_pos.x] == "#":
+            visited.add((new_pos, direction))
             direction = next(directions)
 
         else:
-            visited.add((new_pos, direction))
             grid[new_pos.y][new_pos.x] = "X"
             current_pos = new_pos
     return 0

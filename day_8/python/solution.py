@@ -79,7 +79,6 @@ def part_2(
 ) -> set[Coordinate]:
     def check_along_line(
         pos: Coordinate,
-        other_pos: Coordinate,
         direction: Coordinate,
         antinodes: set[Coordinate],
     ) -> set[Coordinate]:
@@ -94,9 +93,9 @@ def part_2(
         for ind, pos in enumerate(positions):
             for other_pos in positions[ind + 1 :]:
                 distance = pos - other_pos
-                antinodes = check_along_line(pos, other_pos, distance, antinodes)
+                antinodes = check_along_line(pos, distance, antinodes)
                 antinodes = check_along_line(
-                    pos, other_pos, Coordinate(-distance.x, -distance.y), antinodes
+                    pos, Coordinate(-distance.x, -distance.y), antinodes
                 )
     return antinodes
 

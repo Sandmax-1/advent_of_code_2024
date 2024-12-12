@@ -21,10 +21,6 @@ class Coordinate:
         """scalar mult"""
         return Coordinate(scale_factor * self.x, scale_factor * self.y)
 
-    def __abs__(self) -> int:
-        """Implement manhattan distance"""
-        return self.x + self.y
-
 
 def parse_input(
     file_name: str,

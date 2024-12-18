@@ -42,6 +42,7 @@ def parse_input(
     box_positions: list[Coordinate] = []
     direction_str = ""
     walls: set[Coordinate] = set()
+    max_x, max_y, robot_initial_pos = 0, 0, Coordinate(0, 0)
     with open(Path().cwd() / "day_15" / "data" / file_name, "r") as f:
         for y, line in enumerate(f.readlines()):
             line = line.strip()
@@ -81,6 +82,7 @@ def parse_input_part_2(
     box_positions: list[tuple[Coordinate, Coordinate]] = []
     direction_str = ""
     walls: set[tuple[Coordinate, Coordinate]] = set()
+    max_x, max_y, robot_initial_pos = 0, 0, Coordinate(0, 0)
     with open(Path().cwd() / "day_15" / "data" / file_name, "r") as f:
         for y, line in enumerate(f.readlines()):
             line = line.strip()

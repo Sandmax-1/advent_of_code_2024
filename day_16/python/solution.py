@@ -3,6 +3,7 @@ from collections import defaultdict
 from copy import copy, deepcopy
 from dataclasses import dataclass
 from pathlib import Path
+from time import time
 
 
 @dataclass
@@ -145,14 +146,15 @@ def part_1(
     adjacency_map: dict[Coordinate, list[tuple[Coordinate, int, Coordinate]]],
 ) -> tuple[int, set[Coordinate]]:
     visited: set[Coordinate] = set()
-    heap = [(0, start_pos, Coordinate(1, 0))]
+    inds = {node: ind for ind, node in enumerate(adjacency_map.keys())}
+    heap = [(0, start_pos, Coordinate(1, 0), str(inds[start_pos]))]
     heapq.heapify(heap)
 
     distances = {node: 1e10 for node in adjacency_map.keys()}
     distances[start_pos] = 0
 
     while heap:
-        score, pos, current_direction = heapq.heappop(heap)
+        score, pos, current_direction, path = heapq.heappop(heap)
         if pos == end_pos:
             return score, visited
         if pos in visited:
@@ -162,44 +164,6 @@ def part_1(
         for vertex, distance, direction in adjacency_map[pos]:
             if vertex not in visited:
                 if direction == current_direction:
-                    heapq.heappush(heap, (score + distance, vertex, direction))
-
-                else:
-                    heapq.heappush(heap, (score + 1000 + distance, vertex, direction))
-
-    return 0, {Coordinate(0, 0)}
-
-
-def part_2(
-    start_pos: Coordinate,
-    end_pos: Coordinate,
-    adjacency_map: dict[Coordinate, list[tuple[Coordinate, int, Coordinate]]],
-):
-    visited: set[Coordinate] = set()
-    inds = {node: ind for ind, node in enumerate(adjacency_map.keys())}
-    heap = [(0, start_pos, Coordinate(1, 0), str(inds[start_pos]))]
-    heapq.heapify(heap)
-
-    distances = {node: 1e10 for node in adjacency_map.keys()}
-    distances[start_pos] = 0
-    paths: list[tuple[int, str]] = []
-    highscore = 10000000
-
-    while heap:
-        score, pos, current_direction, path = heapq.heappop(heap)
-        if score > highscore:
-            break
-        if pos == end_pos:
-            highscore = score
-            paths.append((score, path))
-        if pos in visited and score > distances[pos]:
-            continue
-        visited.add(pos)
-
-        for vertex, distance, direction in adjacency_map[pos]:
-            if vertex not in visited:
-                if direction == current_direction:
-                    distances[vertex] = min(distances[vertex], score + distance)
                     heapq.heappush(
                         heap,
                         (
@@ -211,7 +175,6 @@ def part_2(
                     )
 
                 else:
-                    distances[vertex] = min(distances[vertex], score + 1000 + distance)
                     heapq.heappush(
                         heap,
                         (
@@ -219,6 +182,69 @@ def part_2(
                             vertex,
                             direction,
                             path + f"-{inds[vertex]}",
+                        ),
+                    )
+
+    return 0, {Coordinate(0, 0)}
+
+
+def part_2(
+    start_pos: Coordinate,
+    end_pos: Coordinate,
+    adjacency_map: dict[Coordinate, list[tuple[Coordinate, int, Coordinate]]],
+):
+    visited: dict[Coordinate, int] = {}
+    inds = {node: ind for ind, node in enumerate(adjacency_map.keys())}
+    heap = [(0, start_pos, Coordinate(1, 0), str(inds[start_pos]))]
+    heapq.heapify(heap)
+
+    distances = {node: 1e10 for node in adjacency_map.keys()}
+    distances[start_pos] = 0
+    paths: list[tuple[int, str]] = []
+    highscore = 10000000
+
+    counter = 0
+    while heap:
+        counter += 1
+        if counter % 100000 == 0:
+            print(len(heap))
+        score, pos, current_direction, path = heapq.heappop(heap)
+        if (pos, current_direction) in visited and score > visited[
+            (pos, current_direction)
+        ]:
+            continue
+        if score > highscore:
+            break
+
+        if pos == end_pos:
+            highscore = score
+            paths.append((score, path))
+        visited[(pos, current_direction)] = score
+
+        for vertex, distance, direction in adjacency_map[pos]:
+            if vertex not in visited:
+                new_path = path + f"-{inds[vertex]}"
+                if direction == current_direction:
+                    # distances[vertex] = min(distances[vertex], score + distance)
+                    heapq.heappush(
+                        heap,
+                        (
+                            score + distance,
+                            vertex,
+                            direction,
+                            new_path,
+                        ),
+                    )
+
+                else:
+                    # distances[vertex] = min(distances[vertex], score + 1000 + distance)
+                    heapq.heappush(
+                        heap,
+                        (
+                            score + 1000 + distance,
+                            vertex,
+                            direction,
+                            new_path,
                         ),
                     )
 
@@ -263,12 +289,18 @@ if __name__ == "__main__":
     walls, start_pos, end_pos, max_dims, adjacency_map = parse_input("actual_input.txt")
     # print_grid(walls, start_pos, end_pos, max_dims, set())
     # print_grid(walls, start_pos, end_pos, max_dims, set(adjacency_map.keys()))
-    sol_1, visited = part_1(walls, start_pos, end_pos, adjacency_map)
-    print(sol_1)
+    # start = time()
+    # sol_1, visited = part_1(walls, start_pos, end_pos, adjacency_map)
+    # end = time()
+    # print(end - start)
+    # print(sol_1)
 
-    # print('input_done')
+    print("input_done")
 
-    # a, paths = part_2(start_pos, end_pos, adjacency_map)
+    # start = time()
+    a, paths = part_2(start_pos, end_pos, adjacency_map)
+    # end = time()
+    # print(end - start)
     # # print(paths)
     # print_grid(walls, start_pos, end_pos, max_dims, paths)
     # print_grid(walls, start_pos, end_pos, max_dims, a)

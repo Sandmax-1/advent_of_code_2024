@@ -1,9 +1,8 @@
 import heapq
 from collections import defaultdict
-from copy import copy, deepcopy
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from time import time
 
 
 @dataclass
@@ -45,7 +44,7 @@ def parse_input(
 ]:
     walls: set[Coordinate] = set()
     empty_space: set[Coordinate] = set()
-    start_pos, end_pos, max_x = Coordinate(0, 0), Coordinate(0, 0), 0
+    start_pos, end_pos, max_x, y = Coordinate(0, 0), Coordinate(0, 0), 0, 0
     with open(Path().cwd() / "day_16" / "data" / file_name, "r") as f:
         for y, line in enumerate(f.readlines()):
             line = line.strip()
@@ -192,8 +191,8 @@ def part_2(
     start_pos: Coordinate,
     end_pos: Coordinate,
     adjacency_map: dict[Coordinate, list[tuple[Coordinate, int, Coordinate]]],
-):
-    visited: dict[Coordinate, int] = {}
+) -> tuple[set[str], set[Coordinate]]:
+    visited: dict[tuple[Coordinate, Coordinate], int] = {}
     inds = {node: ind for ind, node in enumerate(adjacency_map.keys())}
     heap = [(0, start_pos, Coordinate(1, 0), str(inds[start_pos]))]
     heapq.heapify(heap)
@@ -222,7 +221,7 @@ def part_2(
         visited[(pos, current_direction)] = score
 
         for vertex, distance, direction in adjacency_map[pos]:
-            if vertex not in visited:
+            if (vertex, direction) not in visited:
                 new_path = path + f"-{inds[vertex]}"
                 if direction == current_direction:
                     # distances[vertex] = min(distances[vertex], score + distance)
@@ -269,15 +268,15 @@ def part_2(
                 )
                 for ind in range(len(directions))
             ]
-            visited: set[Coordinate] = set()
+            visited_2: set[Coordinate] = set()
             for ind in range(len(path) - 1):
                 start_vertex = path[ind]
                 for multiple in range(distances[ind]):
-                    visited.add(start_vertex - multiple * normalised_directions[ind])
-            visited_tiles.update(visited)
+                    visited_2.add(start_vertex - multiple * normalised_directions[ind])
+            visited_tiles.update(visited_2)
     print(len(visited_tiles))
 
-    a = set()
+    a: set[str] = set()
     for score, path in paths:
         if score == best_score:
             a.update(path)
